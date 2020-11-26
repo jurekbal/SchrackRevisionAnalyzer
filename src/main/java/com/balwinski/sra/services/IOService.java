@@ -1,11 +1,12 @@
 package com.balwinski.sra.services;
 
-import com.balwinski.sra.InvalidDataException;
-
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 
+/*
+This class is deprecated and will be replaced by IOtoList
+ */
 public class IOService {
 
     private static final int MAX_LINE_NUM = 299;
@@ -13,7 +14,7 @@ public class IOService {
     //    private static final String pathString = "d:\\javafiles\\schrack\\P+0 L5 cz1.txt";
     private static final String pathString = "d:\\javafiles\\schrack\\sratest.txt";
 
-    public String[] loadFile() throws IOException, InvalidDataException {
+    public String[] loadFile() throws IOException {
 
         String[] fileLines = new String[MAX_LINE_NUM];
 

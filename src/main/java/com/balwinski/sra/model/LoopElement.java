@@ -1,5 +1,5 @@
 package com.balwinski.sra.model;
 
-public enum LoopElementType {
+public enum LoopElement {
     OSD2000A, MCP545, STD531
 }

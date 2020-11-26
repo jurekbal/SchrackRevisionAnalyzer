@@ -19,24 +19,7 @@ public class main {
             ioService.loadFile();
         } catch (IOException e) {
             e.printStackTrace();
-        } catch (InvalidDataException e) {
-            e.printStackTrace();
         }
-
-        System.out.println("Begin of header (raw array):");
-        String[] header = ioService.getHeader().clone();
-        for (String line : header) {
-            System.out.println(line);
-        }
-        System.out.println("End of Header");
-
-        Header testHeader = new Header(
-                HeaderParser.parseDateLine(header[2]),
-                HeaderParser.parseSCU(header[3]),
-                HeaderParser.parseLoop(header[3])
-        );
-
-        System.out.println(testHeader);
 
         //testing of IOListClass
         IOtoList iOtoList = new IOtoList();
