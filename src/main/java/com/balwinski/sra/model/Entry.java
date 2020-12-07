@@ -4,14 +4,13 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 @Data
 @NoArgsConstructor
 public class Entry {
 
-    private LoopElement elementType;
+    private ElementType elementType;
     private int loopShortAddress;
     private String type;
     private int groupNum;
@@ -21,7 +20,7 @@ public class Entry {
     private int checkedCount;
 
     @Builder
-    public Entry(LoopElement elementType, int loopShortAddress,
+    public Entry(ElementType elementType, int loopShortAddress,
                  String type, int groupNum,
                  int detectorNum, LocalTime firstTriggering,
                  LocalTime lastTriggering, int checkedCount) {
