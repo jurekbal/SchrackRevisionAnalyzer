@@ -15,7 +15,7 @@ public class HeaderValidator {
         return (lineNum >= 1 && lineNum <= 6);
     }
 
-    private void parseHeaderLine(String currentLine, int lineNum) throws InvalidDataException {
+    public void parseHeaderLine(String currentLine, int lineNum) throws InvalidDataException {
         switch (lineNum) {
             case 1: {
                 if (isValidHeaderLine1(currentLine)) {
