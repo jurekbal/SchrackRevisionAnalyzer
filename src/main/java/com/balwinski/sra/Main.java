@@ -1,29 +1,19 @@
 package com.balwinski.sra;
 
 import com.balwinski.sra.model.Entry;
-import com.balwinski.sra.model.Header;
 import com.balwinski.sra.services.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-public class main {
+public class Main {
 
     public static void main(String[] args) {
 
-        IOService ioService = new IOService();
-        Logger log = LoggerFactory.getLogger(main.class);
-
-
-//        try {
-//            ioService.loadFile();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
+        Logger log = LoggerFactory.getLogger(Main.class);
 
         //getting of IOListClass
         log.info("Attempting to load file");
@@ -33,7 +23,6 @@ public class main {
         log.info("After loading file");
 
         HeaderValidator hv = new HeaderValidator();
-//        HeaderParser hp = new HeaderParser();
         EntryValidator ev = new EntryValidator();
         EntryParser ep = new EntryParser();
 
