@@ -6,19 +6,28 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-// Alternative loading of file - all lines at once.
 public class IOService {
 
-    public List<Path> getFileList(Path baseDir){
-        //TODO get file list from recursive directory scan
-        return Collections.emptyList();
+    public List<Path> getFileList(Path baseDir) {
+        try (Stream<Path>paths = Files.walk(baseDir)) {
+            return paths
+                    .filter(Files::isRegularFile)
+                    .filter(path -> path.toString().endsWith(".txt"))
+                    .collect(Collectors.toList());
+        } catch (IOException e) {
+            e.printStackTrace();
+            return Collections.emptyList();
+        }
+
     }
 
-    public List<String> loadLines(String pathString) {
+    public List<String> loadLines(Path filePath) {
         List<String> lines = Collections.emptyList();
         try {
-            lines = Files.readAllLines(Paths.get(pathString));
+            lines = Files.readAllLines(filePath);
         } catch (IOException e) {
             e.printStackTrace();
         }

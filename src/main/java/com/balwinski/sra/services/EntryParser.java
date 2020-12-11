@@ -70,6 +70,7 @@ public class EntryParser {
     }
 
     private ElementType parseElementType(String type) {
+        type = type.replaceAll("-", "_");
         for (ElementType et : ElementType.values()) {
             if (et.name().equals(type)) {
                 return et;
