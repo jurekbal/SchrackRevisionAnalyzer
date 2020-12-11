@@ -12,13 +12,12 @@ public class EntryParser {
 
     private final Logger logger;
 
-    private final String splitRegex = "\t";
-
     public EntryParser() {
         this.logger = LoggerFactory.getLogger(EntryParser.class);
     }
 
     public Entry parseEntry(String entryLine) {
+        String splitRegex = "\t";
         String[] words = entryLine.split(splitRegex);
 
         ElementType elementType = parseElementType(words[0]);

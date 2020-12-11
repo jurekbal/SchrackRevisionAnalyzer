@@ -11,15 +11,17 @@ import java.util.List;
 
 public class Main {
 
+    private static final String pathString = "d:\\javafiles\\schrack\\sratest.txt";
+
     public static void main(String[] args) {
 
         Logger log = LoggerFactory.getLogger(Main.class);
 
         //getting of IOListClass
         log.info("Attempting to load file");
-        IOtoList iOtoList = new IOtoList();
+        IOService IOService = new IOService();
         List<String> lines;
-        lines = iOtoList.loadAllFile();
+        lines = IOService.loadLines(pathString);
         log.info("After loading file");
 
         HeaderValidator hv = new HeaderValidator();

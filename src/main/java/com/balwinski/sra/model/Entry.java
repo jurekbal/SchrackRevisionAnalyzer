@@ -19,6 +19,11 @@ public class Entry {
     LocalTime lastTriggering;
     private int checkedCount;
 
+    // key for detector Map (database)
+    public String getKey() {
+        return String.valueOf(groupNum).concat("/").concat(String.valueOf(detectorNum));
+    }
+
     @Builder
     public Entry(ElementType elementType, int loopShortAddress,
                  String type, int groupNum,
