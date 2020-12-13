@@ -1,74 +1,35 @@
 package com.balwinski.sra.services;
 
-import com.balwinski.sra.InvalidDataException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-/*
-TODO Methods moved from IOService - to reprocess or made all from scratch
- */
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.util.List;
+
 public class HeaderValidator {
 
-    private String[] header = new String[6];
+    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyy-MM-dd HH:mm:ss");
 
-    private static final String invalidHeaderLineMsg = "Invalid header line ";
+    private final Logger log;
 
-    private boolean isHeaderLine(int lineNum) {
-        return (lineNum >= 1 && lineNum <= 6);
+    public HeaderValidator() {
+        log = LoggerFactory.getLogger(HeaderValidator.class);
     }
 
-    public void parseHeaderLine(String currentLine, int lineNum) throws InvalidDataException {
-        switch (lineNum) {
-            case 1: {
-                if (isValidHeaderLine1(currentLine)) {
-                    header[0] = currentLine;
-                } else {
-                    throw new InvalidDataException(invalidHeaderLineMsg + lineNum + "; Readed: " + currentLine);
-                }
-                break;
-            }
-            case 2: {
-                if (isValidHeaderLine2(currentLine)) {
-                    header[1] = currentLine;
-                } else {
-                    throw new InvalidDataException(invalidHeaderLineMsg + lineNum + "; Readed: " + currentLine);
-                }
-                break;
-            }
-            case 3: {
-                if (isValidHeaderLine3(currentLine)) {
-                    header[2] = currentLine;
-                } else {
-                    throw new InvalidDataException(invalidHeaderLineMsg + lineNum + "; Readed: " + currentLine);
-                }
-                break;
-            }
-            case 4: {
-                if (isValidHeaderLine4(currentLine)) {
-                    header[3] = currentLine;
-                } else {
-                    throw new InvalidDataException(invalidHeaderLineMsg + lineNum + "; Readed: " + currentLine);
-                }
-                break;
-            }
-            case 5: {
-                if (isValidHeaderLine5(currentLine)) {
-                    header[4] = currentLine;
-                } else {
-                    throw new InvalidDataException(invalidHeaderLineMsg + lineNum + "; Readed: " + currentLine);
-                }
-                break;
-            }
-            case 6: {
-                if (isValidHeaderLine6(currentLine)) {
-                    header[5] = currentLine;
-                } else {
-                    throw new InvalidDataException(invalidHeaderLineMsg + lineNum + "; Readed: " + currentLine);
-                }
-                break;
-            }
-            default: {
-
-            }
+    public boolean isValid(List<String> lines) {
+        if (lines.size() < 6) {
+            return false;
         }
+        return (
+                isValidHeaderLine1(lines.get(0))
+                && isValidHeaderLine2(lines.get(1))
+                && isValidHeaderLine3(lines.get(2))
+                && isValidHeaderLine4(lines.get(3))
+                && isValidHeaderLine5(lines.get(4))
+                && isValidHeaderLine6(lines.get(5))
+        );
     }
 
     private boolean isValidHeaderLine1(String currentLine) {
@@ -80,8 +41,16 @@ public class HeaderValidator {
     }
 
     private boolean isValidHeaderLine3(String currentLine) {
-        //dddd-dd-dd dd:dd:dd - date time line
-        return currentLine.matches("\\d{4}-\\d{2}-\\d{2}\\s\\d{2}:\\d{2}:\\d{2}");
+        //dddd-dd-dd dd:dd:dd - date time line (yyy-MM-dd HH:mm:ss)
+        if (currentLine.matches("\\d{4}-\\d{2}-\\d{2}\\s\\d{2}:\\d{2}:\\d{2}")) {
+            try {
+                LocalDateTime.parse(currentLine, formatter);
+                return true;
+            } catch (DateTimeParseException e) {
+                log.error(e.getLocalizedMessage());
+            }
+        };
+        return false;
     }
 
     private boolean isValidHeaderLine4(String currentLine) {

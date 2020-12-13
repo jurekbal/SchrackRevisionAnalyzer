@@ -7,7 +7,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class EntryTest {
 
     @Test
-    public void getKey() {
+    public void mustReturnValidEntryKey() {
         //given
         Entry entry = Entry.builder()
                 .groupNum(123)

@@ -1,8 +1,11 @@
 package com.balwinski.sra.model;
 
+import lombok.Data;
+
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+@Data
 public class Header {
 
     private LocalDateTime dateTime;

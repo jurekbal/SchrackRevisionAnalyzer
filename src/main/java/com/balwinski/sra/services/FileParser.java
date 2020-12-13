@@ -1,6 +1,5 @@
 package com.balwinski.sra.services;
 
-import com.balwinski.sra.InvalidDataException;
 import com.balwinski.sra.model.Entry;
 import com.balwinski.sra.model.Header;
 import com.balwinski.sra.model.ReportFile;
@@ -12,7 +11,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FilesParser {
+public class FileParser {
 
     private final IOService ioService;
     private final HeaderValidator headerValidator;
@@ -20,30 +19,35 @@ public class FilesParser {
     private final EntryParser entryParser;
     private final Logger log;
 
-    public FilesParser() {
+    public FileParser() {
         this.ioService = new IOService();
         this.headerValidator = new HeaderValidator();
         this.entryValidator = new EntryValidator();
         this.entryParser = new EntryParser();
-        this.log = LoggerFactory.getLogger(FilesParser.class);
+        this.log = LoggerFactory.getLogger(FileParser.class);
     }
 
     public List<ReportFile> parseDir(Path dir) {
         List<Path> fileList = ioService.getFileList(dir);
-        System.out.println("File num recognized:" + fileList.size());
+        System.out.println("Text files recognized:" + fileList.size());
 
         List<ReportFile> reportFiles = new ArrayList<>();
 
         for (Path file : fileList) {
-            log.info("Attempting with file" + file);
+            log.info("Attempting with file: " + file);
             List<String> lines = ioService.loadLines(file);
 
             Header header = parseHeader(lines);
-            List<Entry> entries = parseEntries(lines);
-            reportFiles.add(new ReportFile(file, header, entries));
-
+            if (isValid(header)) {
+                List<Entry> entries = parseEntries(lines);
+                reportFiles.add(new ReportFile(file, header, entries));
+            }
         }
         return reportFiles;
+    }
+
+    private boolean isValid(Header header) {
+        return (header.getDateTime() != null && header.getScu() > 0 && header.getLoop() > 0);
     }
 
     private List<Entry> parseEntries(List<String> lines) {
@@ -59,12 +63,6 @@ public class FilesParser {
                 }
             }
         }
-
-        //debug
-//        log.info("Entries parsed: " + entries.size());
-//        System.out.println(entries.get(0));
-//        System.out.println(entries.get(entries.size() - 1));
-
         return entries;
     }
 
@@ -72,22 +70,12 @@ public class FilesParser {
         LocalDateTime fileDT = null;
         int scu = -1;
         int loop = -1;
-        if (lines.size() >= 6) {
-            for (int i = 0; i < 6; i++) {
-                try {
-                    headerValidator.parseHeaderLine(lines.get(i), i + 1);
-                    if (i == 2) {
-                        fileDT = HeaderParser.parseDateLine(lines.get(i));
-                    }
-                    if (i == 3) {
-                        scu = HeaderParser.parseSCU(lines.get(3));
-                        loop = HeaderParser.parseLoop(lines.get(3));
-                    }
-                } catch (InvalidDataException e) {
-                    e.printStackTrace();
-                }
-            }
+        if (headerValidator.isValid(lines)) {
+            fileDT = HeaderParser.parseDateLine(lines.get(2));
+            scu = HeaderParser.parseSCU(lines.get(3));
+            loop = HeaderParser.parseLoop(lines.get(3));
         }
+
         if (fileDT == null || scu == -1 || loop == -1) {
             log.error("Header parse failed");
             return new Header(null, -1, -1);
