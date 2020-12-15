@@ -4,13 +4,17 @@ import com.balwinski.sra.model.TestingData;
 import com.balwinski.sra.model.Entry;
 import com.balwinski.sra.model.ReportFile;
 import com.balwinski.sra.services.FileParser;
+import com.balwinski.sra.services.IOService;
 
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class Main {
 
-    private static final String pathStringToTestDir = "d:\\javafiles\\schrack\\dbtest";
+    private static final String pathStringToTestDir = "d:\\javafiles\\schrack\\txt";
+    private static final String pathStringResultFile = "d:\\javafiles\\schrack\\txt\\ResultList.txt";
+    private static final Map<String, List<TestingData>> db = new HashMap<>();
 
     public static void main(String[] args) {
 
@@ -23,7 +27,6 @@ public class Main {
 //                .forEach(System.out::println);
 
         // creating database with group/detector key and list of testing data
-        Map<String, List<TestingData>> db = new HashMap<>();
         for (ReportFile file : reportFiles) {
             List<Entry> entries = file.getEntries();
             for (Entry entry : entries) {
@@ -39,18 +42,36 @@ public class Main {
 
             }
         }
-
         System.out.println("Database size: " + db.size() + " entries.");
-//        Set<String> keySet = db.keySet();
-//        keySet.stream().sorted().limit(100).forEach(System.out::println);
-        db.entrySet().stream().limit(10).forEach(Main::printDbEntry);
+
+        //getting never tested detectors
+        Set<String> neverTested = db.keySet().stream().filter(Main::wasNotTested).collect(Collectors.toSet());
+        System.out.println("Number of never tested detectors: " + neverTested.size());
+
+        // prepare presentation data and save to result file
+        List<String> resultList = neverTested.stream()
+                .map(s -> s.concat(" at loop: " + db.get(s).get(0).getFile().getHeader().getLoop()))
+                .sorted()
+                .collect(Collectors.toList());
+        IOService ios = new IOService();
+        String resultMsg = ios.writeResultList(pathStringResultFile, resultList);
+        if (!resultMsg.equals("")) {
+            System.out.println("ERROR: " + resultMsg);
+        } else {
+            System.out.println("INFO: Result file created: ResultList.txt");
+        }
 
         //TODO next
-        // detectors database (Map) - DONE!
-        // test database, extract not tested detectors
+        // detectors database (Map) - DONE! (to refactor)
+        // test database, extract not tested detectors - DONE (may be enhanced, to refactor)
         // list of invalid text files found in directory tree - to log in summary
         // tests and test methods (Header parser, ...)
         // getting base path from execute location and/or args
+    }
+
+    private static boolean wasNotTested(String key) {
+        List<TestingData> testingData = db.get(key);
+        return testingData.stream().allMatch(testingData1 -> testingData1.getEntry().getCheckedCount() == 0);
     }
 
     private static void printDbEntry(Map.Entry<String, List<TestingData>> dbEntry) {

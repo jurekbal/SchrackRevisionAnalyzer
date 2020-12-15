@@ -1,10 +1,10 @@
 package com.balwinski.sra.services;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -33,5 +33,17 @@ public class IOService {
             e.printStackTrace();
         }
         return lines;
+    }
+
+    public String writeResultList(String filePathString, List<String> resultList) {
+        String errorMsg = "";
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(filePathString))) {
+            for (String line : resultList) {
+                bw.write(line +"\n");
+            }
+        } catch (IOException e) {
+            errorMsg = e.getLocalizedMessage();
+        }
+        return errorMsg;
     }
 }
