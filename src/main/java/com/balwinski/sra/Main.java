@@ -14,26 +14,76 @@ public class Main {
 
     private static final String pathStringToTestDir = "d:\\javafiles\\schrack\\txt";
     private static final String pathStringResultFile = "d:\\javafiles\\schrack\\txt\\ResultList.txt";
+
     private static final Map<String, List<TestingData>> db = new HashMap<>();
+    private static List<ReportFile> reportFiles = new ArrayList<>();
+
+    private static boolean basicLogging = true;
+    private static boolean extendedLogging = false;
 
     public static void main(String[] args) {
 
+        parseReportFiles();
+        createDatabase();
+        Set<String> neverTested = getNeverTested();
+        List<String> resultList = getResultList(neverTested);
+        saveResultFile(resultList);
+
+        //TODO next
+        // getting base path from execute location and/or args
+        // Exception handling (incorrect path and other), choose handle exception place
+        // list of invalid text files found in directory tree - logging warnings, errors
+        // tests and test methods (Header parser, ...)
+    }
+
+    private static List<String> getResultList(Set<String> neverTested) {
+        return neverTested.stream()
+                .map(s -> s.concat(" at loop: " + db.get(s).get(0).getFile().getHeader().getLoop()))
+                .sorted()
+                .collect(Collectors.toList());
+    }
+
+    private static Set<String> getNeverTested() {
+        Set<String> neverTested = db.keySet().stream().filter(Main::wasNotTested).collect(Collectors.toSet());
+        if (basicLogging) {
+            System.out.println("Number of never tested detectors: " + neverTested.size());
+        }
+        return neverTested;
+    }
+
+    private static void parseReportFiles() {
         FileParser fileParser = new FileParser();
-        List<ReportFile> reportFiles = fileParser.parseDir(Paths.get(pathStringToTestDir));
+        reportFiles = fileParser.parseDir(Paths.get(pathStringToTestDir));
 
-        System.out.println("Files imported into database: " + reportFiles.size());
-//        reportFiles.stream()
-//                .map(ReportFile::getPath)
-//                .forEach(System.out::println);
+        if (basicLogging) {
+            System.out.println("Files imported into database: " + reportFiles.size());
+        }
+        if (extendedLogging) {
+            printReportFilesList();
+        }
+    }
 
-        // creating database with group/detector key and list of testing data
+    private static void saveResultFile(List<String> resultList) {
+        IOService ios = new IOService();
+        String resultMsg = ios.writeResultList(pathStringResultFile, resultList);
+
+        if (basicLogging) {
+            if (!resultMsg.equals("")) {
+                System.out.println("ERROR: " + resultMsg);
+            } else {
+                System.out.println("INFO: Result file created: ResultList.txt");
+            }
+        }
+    }
+
+    private static void createDatabase() {
         for (ReportFile file : reportFiles) {
             List<Entry> entries = file.getEntries();
             for (Entry entry : entries) {
                 String key = entry.getKey();
                 List<TestingData> testingDataList = db.get(key);
                 if (testingDataList == null) {
-                    //detector first encounter - create new entry in db
+                    //encounter detector first time => create new entry in db
                     db.put(key, new ArrayList<>(Collections.singletonList(new TestingData(file, entry))));
                 } else {
                     //update testingDataList
@@ -42,31 +92,15 @@ public class Main {
 
             }
         }
-        System.out.println("Database size: " + db.size() + " entries.");
-
-        //getting never tested detectors
-        Set<String> neverTested = db.keySet().stream().filter(Main::wasNotTested).collect(Collectors.toSet());
-        System.out.println("Number of never tested detectors: " + neverTested.size());
-
-        // prepare presentation data and save to result file
-        List<String> resultList = neverTested.stream()
-                .map(s -> s.concat(" at loop: " + db.get(s).get(0).getFile().getHeader().getLoop()))
-                .sorted()
-                .collect(Collectors.toList());
-        IOService ios = new IOService();
-        String resultMsg = ios.writeResultList(pathStringResultFile, resultList);
-        if (!resultMsg.equals("")) {
-            System.out.println("ERROR: " + resultMsg);
-        } else {
-            System.out.println("INFO: Result file created: ResultList.txt");
+        if (basicLogging) {
+            System.out.println("Database size: " + db.size() + " entries.");
         }
+    }
 
-        //TODO next
-        // detectors database (Map) - DONE! (to refactor)
-        // test database, extract not tested detectors - DONE (may be enhanced, to refactor)
-        // list of invalid text files found in directory tree - to log in summary
-        // tests and test methods (Header parser, ...)
-        // getting base path from execute location and/or args
+    private static void printReportFilesList() {
+                reportFiles.stream()
+                .map(ReportFile::getPath)
+                .forEach(System.out::println);
     }
 
     private static boolean wasNotTested(String key) {
