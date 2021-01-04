@@ -23,6 +23,9 @@ public class Main {
 
     public static void main(String[] args) {
 
+        // for future use when running from jar file
+        String workingDir = System.getProperty("user.dir");
+
         parseReportFiles();
         createDatabase();
         Set<String> neverTested = getNeverTested();

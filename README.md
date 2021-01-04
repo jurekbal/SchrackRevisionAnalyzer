@@ -16,7 +16,9 @@ OSD2000A	38	Detector (1)	15/9	10:46:25	10:46:25	CHECKED
 
 ### Usage
 
-Project is in early dev phase.
+Project is in dev phase. Core idea is working.
+Some properties like paths are still hardcoded.
+Suggest to running with IDE.
 
 ### Author
 
