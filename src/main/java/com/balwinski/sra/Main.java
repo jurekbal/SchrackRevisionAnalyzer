@@ -12,8 +12,9 @@ import java.util.stream.Collectors;
 
 public class Main {
 
-    private static final String pathStringToTestDir = "d:\\javafiles\\schrack\\txt";
-    private static final String pathStringResultFile = "d:\\javafiles\\schrack\\txt\\ResultList.txt";
+    private static String pathStringToTestDir = "d:\\javafiles\\schrack\\txt";
+    private static String outputFilename = "ResultList.txt";
+    private static String pathStringResultFile = pathStringToTestDir.concat("\\").concat(outputFilename);
 
     private static final Map<String, List<TestingData>> db = new HashMap<>();
     private static List<ReportFile> reportFiles = new ArrayList<>();
@@ -23,8 +24,10 @@ public class Main {
 
     public static void main(String[] args) {
 
-        // for future use when running from jar file
+        // Paths for production:
         String workingDir = System.getProperty("user.dir");
+        pathStringToTestDir = workingDir;
+        pathStringResultFile = workingDir.concat("\\").concat(outputFilename);
 
         parseReportFiles();
         createDatabase();
@@ -33,7 +36,7 @@ public class Main {
         saveResultFile(resultList);
 
         //TODO next
-        // getting base path from execute location and/or args
+        // getting base path from execute location and/or args (dev/prod configs?)
         // Exception handling (incorrect path and other), choose handle exception place
         // list of invalid text files found in directory tree - logging warnings, errors
         // tests and test methods (Header parser, ...)

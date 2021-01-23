@@ -2,7 +2,6 @@ package com.balwinski.sra.services;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.jupiter.api.BeforeAll;
 
 import java.util.ArrayList;
 import java.util.Arrays;
